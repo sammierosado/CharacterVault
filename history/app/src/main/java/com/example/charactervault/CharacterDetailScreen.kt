@@ -2,6 +2,7 @@ package com.example.charactervault
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -51,29 +52,31 @@ fun CharacterDetailScreen(characterId: Int) {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            characterDetail?.let { detail ->
-                Image(
-                    painter = rememberAsyncImagePainter(detail.image.medium_url),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = detail.name, style = MaterialTheme.typography.headlineMedium)
-                Text(text = detail.real_name ?: "", style = MaterialTheme.typography.bodyLarge)
-                Text(text = detail.aliases ?: "", style = MaterialTheme.typography.bodyLarge)
-                Text(text = detail.deck ?: "", style = MaterialTheme.typography.bodyLarge)
-                Text(text = detail.description ?: "", style = MaterialTheme.typography.bodyLarge)
-            } ?: run {
-                Text(text = "Loading...", style = MaterialTheme.typography.bodyLarge)
+            item {
+                characterDetail?.let { detail ->
+                    Image(
+                        painter = rememberAsyncImagePainter(detail.image.medium_url),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = detail.name, style = MaterialTheme.typography.headlineMedium)
+                    Text(text = detail.real_name ?: "", style = MaterialTheme.typography.bodyLarge)
+                    Text(text = detail.aliases ?: "", style = MaterialTheme.typography.bodyLarge)
+                    Text(text = detail.deck ?: "", style = MaterialTheme.typography.bodyLarge)
+                    Text(text = detail.description ?: "", style = MaterialTheme.typography.bodyLarge)
+                } ?: run {
+                    Text(text = "Loading...", style = MaterialTheme.typography.bodyLarge)
+                }
             }
         }
     }
