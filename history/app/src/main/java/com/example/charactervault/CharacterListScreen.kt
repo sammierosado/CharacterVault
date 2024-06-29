@@ -13,6 +13,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.charactervault.model.Character
 import com.example.charactervault.model.Image
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CharacterListScreen(navController: NavController) {
     var characters by remember { mutableStateOf(listOf<Character>()) }
+    var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -37,6 +39,8 @@ fun CharacterListScreen(navController: NavController) {
                 errorMessage = "Failed to load characters: ${e.message}"
                 e.printStackTrace()
                 snackbarHostState.showSnackbar(message = errorMessage ?: "Unknown error")
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -44,10 +48,32 @@ fun CharacterListScreen(navController: NavController) {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
-        LazyColumn(contentPadding = innerPadding) {
-            items(characters) { character ->
-                CharacterRow(character = character) {
-                    navController.navigate("characterDetail/${character.id}")
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Character List",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                LazyColumn {
+                    items(characters) { character ->
+                        CharacterRow(character = character) {
+                            navController.navigate("characterDetail/${character.id}")
+                        }
+                    }
                 }
             }
         }
@@ -64,7 +90,7 @@ fun CharacterRow(character: Character, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = rememberImagePainter(character.image.icon_url),
+            painter = rememberAsyncImagePainter(character.image.icon_url),
             contentDescription = null,
             modifier = Modifier.size(64.dp),
             contentScale = ContentScale.Crop
