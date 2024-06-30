@@ -24,7 +24,15 @@ data class CharacterDetail(
     val name: String,
     val real_name: String?,
     val aliases: String?,
+    val gender: String?,
+    val birthday: String?,
     val deck: String?,
     val description: String?,
+    val first_appeared_in_game: Game?,
+    val site_detail_url: String?,
     val image: Image
+)
+
+data class Game(
+    val name: String
 )

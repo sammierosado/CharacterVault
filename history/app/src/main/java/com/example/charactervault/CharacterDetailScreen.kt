@@ -1,15 +1,18 @@
 package com.example.charactervault
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.text.HtmlCompat
 import coil.compose.rememberAsyncImagePainter
 import com.example.charactervault.model.CharacterDetail
 import com.example.charactervault.network.RetrofitInstance
@@ -36,6 +39,7 @@ fun CharacterDetailScreen(characterId: Int) {
                             apiKey = "ea98adc584efb356fcd14b949f8a9f2aa2b270b8"
                         )
                     }
+                    Log.d("CharacterDetail", "Character Details: $response")
                     characterDetail = response.results
                 } catch (e: Exception) {
                     errorMessage = "Failed to load character details: ${e.message}"
@@ -44,7 +48,7 @@ fun CharacterDetailScreen(characterId: Int) {
                 }
             } else {
                 errorMessage = "No internet connection"
-                snackbarHostState.showSnackbar(message = errorMessage!!)
+                snackbarHostState.showSnackbar(message = errorMessage ?: "No internet connection")
             }
         }
     }
@@ -69,13 +73,69 @@ fun CharacterDetailScreen(characterId: Int) {
                         contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.height(16.dp))
+
                     Text(text = detail.name, style = MaterialTheme.typography.headlineMedium)
-                    Text(text = detail.real_name ?: "", style = MaterialTheme.typography.bodyLarge)
-                    Text(text = detail.aliases ?: "", style = MaterialTheme.typography.bodyLarge)
-                    Text(text = detail.deck ?: "", style = MaterialTheme.typography.bodyLarge)
-                    Text(text = detail.description ?: "", style = MaterialTheme.typography.bodyLarge)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    detail.real_name?.let {
+                        Text(text = "Real Name: $it", style = MaterialTheme.typography.bodyLarge)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    detail.aliases?.let {
+                        Text(text = "Aliases: $it", style = MaterialTheme.typography.bodyLarge)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    detail.gender?.let {
+                        val genderText = when (it) {
+                            1.toString() -> "Male"
+                            2.toString() -> "Female"
+                            else -> "Other"
+                        }
+                        Text(text = "Gender: $genderText", style = MaterialTheme.typography.bodyLarge)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    detail.birthday?.let {
+                        Text(text = "Birthday: $it", style = MaterialTheme.typography.bodyLarge)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    detail.first_appeared_in_game?.let {
+                        Text(text = "First Appeared In: ${it.name}", style = MaterialTheme.typography.bodyLarge)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                    Text(text = "Brief Summary (Deck)", style = MaterialTheme.typography.headlineSmall)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = detail.deck ?: "No brief description available",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = "Detailed Description", style = MaterialTheme.typography.headlineSmall)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = HtmlCompat.fromHtml(detail.description ?: "No detailed description available", HtmlCompat.FROM_HTML_MODE_LEGACY).toString(),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    detail.site_detail_url?.let {
+                        Text(
+                            text = "More Info: $it",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 } ?: run {
-                    Text(text = "Loading...", style = MaterialTheme.typography.bodyLarge)
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }
