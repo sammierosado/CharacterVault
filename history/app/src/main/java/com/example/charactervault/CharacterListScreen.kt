@@ -2,11 +2,32 @@ package com.example.charactervault.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -14,7 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.example.charactervault.model.Character
 import com.example.charactervault.model.Image
 import com.example.charactervault.network.RetrofitInstance
@@ -23,6 +43,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun CharacterListScreen(navController: NavController) {
     var characters by remember { mutableStateOf(listOf<Character>()) }
+    var filteredCharacters by remember { mutableStateOf(listOf<Character>()) }
+    var searchText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -35,6 +57,7 @@ fun CharacterListScreen(navController: NavController) {
                     apiKey = "ea98adc584efb356fcd14b949f8a9f2aa2b270b8"
                 )
                 characters = response.results
+                filteredCharacters = characters
             } catch (e: Exception) {
                 errorMessage = "Failed to load characters: ${e.message}"
                 e.printStackTrace()
@@ -59,6 +82,20 @@ fun CharacterListScreen(navController: NavController) {
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
+            TextField(
+                value = searchText,
+                onValueChange = { newText ->
+                    searchText = newText
+                    filteredCharacters = if (newText.isEmpty()) {
+                        characters
+                    } else {
+                        characters.filter { it.name.contains(newText, ignoreCase = true) }
+                    }
+                },
+                label = { Text("Search") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             if (isLoading) {
                 Box(
                     modifier = Modifier
@@ -69,7 +106,7 @@ fun CharacterListScreen(navController: NavController) {
                 }
             } else {
                 LazyColumn {
-                    items(characters) { character ->
+                    items(filteredCharacters) { character ->
                         CharacterRow(character = character) {
                             navController.navigate("characterDetail/${character.id}")
                         }

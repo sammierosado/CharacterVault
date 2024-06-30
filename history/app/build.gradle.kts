@@ -94,4 +94,12 @@ dependencies {
 
     implementation(libs.jsoup)
 
+    // UI Testing
+    androidTestImplementation(libs.ui.test.junit4)
+    debugImplementation(libs.ui.test.manifest)
+
+    // Unit Testing
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.android)
 }

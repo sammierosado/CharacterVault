@@ -30,7 +30,7 @@ data class CharacterDetail(
     val description: String?,
     val first_appeared_in_game: Game?,
     val site_detail_url: String?,
-    val image: Image
+    val image: Image?
 )
 
 data class Game(
