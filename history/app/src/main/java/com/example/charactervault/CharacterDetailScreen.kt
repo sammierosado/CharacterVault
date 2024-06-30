@@ -12,7 +12,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.text.HtmlCompat
 import coil.compose.rememberAsyncImagePainter
 import com.example.charactervault.model.CharacterDetail
 import com.example.charactervault.network.RetrofitInstance
@@ -20,7 +19,8 @@ import com.example.charactervault.network.isNetworkAvailable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 @Composable
 fun CharacterDetailScreen(characterId: Int) {
     val context = LocalContext.current
@@ -119,10 +119,24 @@ fun CharacterDetailScreen(characterId: Int) {
 
                     Text(text = "Detailed Description", style = MaterialTheme.typography.headlineSmall)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = HtmlCompat.fromHtml(detail.description ?: "No detailed description available", HtmlCompat.FROM_HTML_MODE_LEGACY).toString(),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+
+                    val parsedHtmlContent = parseHtmlContent(detail.description ?: "No detailed description available")
+                    parsedHtmlContent.forEach { element ->
+                        when (element) {
+                            is HtmlText -> Text(text = element.text, style = MaterialTheme.typography.bodyLarge)
+                            is HtmlImage -> {
+                                Image(
+                                    painter = rememberAsyncImagePainter(element.url),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
                     detail.site_detail_url?.let {
@@ -140,6 +154,34 @@ fun CharacterDetailScreen(characterId: Int) {
             }
         }
     }
+}
+
+sealed class HtmlElement
+data class HtmlText(val text: String) : HtmlElement()
+data class HtmlImage(val url: String) : HtmlElement()
+
+fun parseHtmlContent(html: String): List<HtmlElement> {
+    val document: Document = Jsoup.parse(html)
+    val elements = mutableListOf<HtmlElement>()
+
+    document.body().allElements.forEach { element ->
+        when (element.tagName()) {
+            "p" -> elements.add(HtmlText(element.text()))
+            "img" -> {
+                val imgUrl = element.attr("src")
+                if (imgUrl.isNotEmpty()) {
+                    elements.add(HtmlImage(imgUrl))
+                }
+            }
+            else -> {
+                if (element.hasText()) {
+                    elements.add(HtmlText(element.text()))
+                }
+            }
+        }
+    }
+
+    return elements
 }
 
 @Preview(showBackground = true)

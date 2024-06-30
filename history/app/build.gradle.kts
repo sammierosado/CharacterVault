@@ -74,7 +74,7 @@ dependencies {
 
     // Coil for image loading
     implementation(libs.coil)
-    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation(libs.coil.compose)
 
 
 
@@ -91,4 +91,7 @@ dependencies {
 
     // Optional: For caching
     implementation(libs.retrofit2.kotlinx.serialization.converter)
+
+    implementation(libs.jsoup)
+
 }
