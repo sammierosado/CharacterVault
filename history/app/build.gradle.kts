@@ -1,7 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { stream ->
+        localProperties.load(stream)
+    }
+}
+val apiKey: String = localProperties.getProperty("GIANT_BOMB_API_KEY") ?: ""
 
 android {
     namespace = "com.example.charactervault"
@@ -18,6 +29,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "GIANT_BOMB_API_KEY", "\"${apiKey}\"")
     }
 
     buildTypes {
@@ -38,19 +51,19 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes.add("/META-INF/{AL2.0,LGPL2.1}")
         }
     }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -75,8 +88,6 @@ dependencies {
     // Coil for image loading
     implementation(libs.coil)
     implementation(libs.coil.compose)
-
-
 
     // RecyclerView for the list
     implementation(libs.androidx.recyclerview)

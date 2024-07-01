@@ -55,7 +55,7 @@ fun CharacterDetailScreen(characterId: Int) {
                     val response = withContext(Dispatchers.IO) {
                         RetrofitInstance.api.getCharacterDetails(
                             id = characterId,
-                            apiKey = "ea98adc584efb356fcd14b949f8a9f2aa2b270b8"
+                            apiKey = BuildConfig.GIANT_BOMB_API_KEY
                         )
                     }
                     Log.d("CharacterDetail", "Character Details: $response")
