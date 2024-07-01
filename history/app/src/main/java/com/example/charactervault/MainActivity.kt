@@ -12,7 +12,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.charactervault.ui.CharacterListScreen
 import com.example.charactervault.ui.theme.CharacterVaultTheme
 
 class MainActivity : ComponentActivity() {
