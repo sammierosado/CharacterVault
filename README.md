@@ -31,10 +31,24 @@ Character Vault is an Android application that displays a list of characters and
 3. Navigate to the location of the project and select the project folder.
 4. Click `OK` to open the project.
 
-## Add Your API Key
+### Add your API key:
 
-1. Open the `RetrofitInstance` object in your project.
-2. Replace `[YOUR API KEY]` with your actual API key in the `RetrofitInstance` object.
+**Option 1: Hardcode the API key**  
+In the `CharacterDetailScreen.kt` file, replace `"YOUR_API_KEY"` with your actual API key:
+```
+RetrofitInstance.api.getCharacterDetails(
+    id = characterId,
+    apiKey = "YOUR_API_KEY"
+)
+```
+**Option 2: Use local.properties**
+Add the following line to your local.properties file (create the file if it doesn't exist):
+
+```
+
+GIANT_BOMB_API_KEY=your_actual_api_key
+
+```
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
