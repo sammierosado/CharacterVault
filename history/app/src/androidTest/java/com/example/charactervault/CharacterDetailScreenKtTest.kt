@@ -18,7 +18,6 @@ class CharacterDetailScreenTest {
 
     @Test
     fun testCharacterDetailScreen() {
-        // Mock data
         val characterDetail = CharacterDetail(
             name = "Scorpion",
             real_name = "Hanzo Hasashi",

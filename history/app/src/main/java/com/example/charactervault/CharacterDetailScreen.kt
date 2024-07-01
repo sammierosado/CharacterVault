@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
@@ -107,8 +108,8 @@ fun CharacterDetailScreen(characterId: Int) {
 
                     detail.gender?.let {
                         val genderText = when (it) {
-                            1.toString() -> "Male"
-                            2.toString() -> "Female"
+                            "1" -> "Male"
+                            "2" -> "Female"
                             else -> "Other"
                         }
                         Text(text = "Gender: $genderText", style = MaterialTheme.typography.bodyLarge)
@@ -131,7 +132,8 @@ fun CharacterDetailScreen(characterId: Int) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = detail.deck ?: "No brief description available",
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Justify
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -141,7 +143,7 @@ fun CharacterDetailScreen(characterId: Int) {
                     val parsedHtmlContent = parseHtmlContent(detail.description ?: "No detailed description available")
                     parsedHtmlContent.forEach { element ->
                         when (element) {
-                            is HtmlText -> Text(text = element.text, style = MaterialTheme.typography.bodyLarge)
+                            is HtmlText -> Text(text = element.text, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Justify)
                             is HtmlImage -> {
                                 Image(
                                     painter = rememberAsyncImagePainter(element.url),
@@ -149,7 +151,7 @@ fun CharacterDetailScreen(characterId: Int) {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(200.dp),
-                                    contentScale = ContentScale.Crop
+                                    contentScale = ContentScale.Fit
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
